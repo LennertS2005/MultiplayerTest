@@ -26,10 +26,6 @@ public class PlayerHealthBar : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (mainCamera != null)
-        {
-            healthBarObject.transform.rotation = mainCamera.transform.rotation;
-        }
 
         // Hide health bar after timeout
         if (healthBarObject.activeSelf)

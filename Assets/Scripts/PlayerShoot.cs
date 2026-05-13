@@ -98,6 +98,13 @@ public class PlayerShoot : NetworkBehaviour
         lastShootTime = Time.time;
     }
 
+    public float GetShotgunAmmoPercent()
+    {
+            float timeSinceLastShotgun = Time.time - lastShootTime;
+            float percent = Mathf.Clamp01(timeSinceLastShotgun / shotgunCooldown);
+            return percent;
+    }
+
     private void OnShootCanceled(InputAction.CallbackContext ctx)
     {
         canShoot = false;

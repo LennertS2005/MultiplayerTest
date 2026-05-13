@@ -20,6 +20,13 @@ public class PlayerMovement : NetworkBehaviour
         shootComponent = GetComponent<PlayerShoot>();
     }
 
+    public void Escape(InputAction.CallbackContext ctx)
+    {
+        if (!IsOwner) return;
+
+        FindFirstObjectByType<NetworkUI>().Escape(ctx);
+    }
+
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
@@ -32,7 +39,21 @@ public class PlayerMovement : NetworkBehaviour
         playerInput.enabled = true;
         moveAction = playerInput.actions["Move"];
 
-        RegisterPlayerServerRpc();
+        NameManager nameManager = FindFirstObjectByType<NameManager>();
+        if (nameManager != null)
+        {
+            string playerName = nameManager.GetName();
+            if (string.IsNullOrEmpty(playerName))
+            {
+                playerName = $"Player {OwnerClientId}";
+            }
+            RegisterPlayerServerRpc(playerName);
+        }
+        else
+        {
+            Debug.LogWarning("NameManager not found in the scene. Player will be registered with default name.");
+            RegisterPlayerServerRpc($"Player {OwnerClientId}");
+        }
         RegisterKillUI();
     }
 
@@ -66,9 +87,9 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RegisterPlayerServerRpc()
+    private void RegisterPlayerServerRpc(string playerName)
     {
         PlayerManager manager = PlayerManager.Instance;
-        manager.AddPlayer(gameObject);
+        manager.AddPlayer(gameObject, playerName);
     }
 }

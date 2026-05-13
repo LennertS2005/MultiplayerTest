@@ -24,6 +24,8 @@ public class Bomb : NetworkBehaviour
 
     private void Explode()
     {
+        if (!IsServer) return;
+
         ShowExplosionClientRpc();
 
         Explosion explosionScript =

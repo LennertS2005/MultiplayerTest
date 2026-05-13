@@ -3,48 +3,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-/*
-public class PlayerManager : NetworkBehaviour
-{
-    [SerializeField] PlayerInput serverInput;
-    private List<GameObject> players = new List<GameObject>();
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public override void OnNetworkSpawn()
-    {
-        if (IsServer)
-        {
-            serverInput.enabled = true;
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!IsServer) return;
-        
-        print("Player Count: " + players.Count);
-    }
-
-    public void AddPlayer(GameObject player)
-    {
-        if (!IsServer) return;
-        players.Add(player);
-    }
-
-    public void RespawnAllPlayers()
-    {
-        if (!IsServer) return;
-        foreach (var player in players)
-        {
-            var health = player.GetComponent<PlayerHealth>();
-            if (health != null)
-            {
-                health.Respawn();
-            }
-        }
-    }
-}*/
-
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance;
@@ -71,14 +29,49 @@ public class PlayerManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        foreach (var player in players)
+        {
+            if (player == null)
+            {
+                Debug.LogWarning("Found a null player reference. Removing from list.");
+                players.Remove(player);
+                break;
+            }
+        }
     }
 
-    public void AddPlayer(GameObject player)
+    public void AddPlayer(GameObject player, string playerName)
     {
+        if (players.Count >= 4)
+        {
+            var netObj = player.GetComponent<NetworkObject>();
+
+            if (netObj != null && netObj.IsSpawned)
+            {
+                netObj.Despawn(true);
+            }
+
+            Debug.LogWarning("Maximum player count reached. Cannot add more players.");
+            return;
+        }
+
         players.Add(player);
 
         Debug.Log("Added player. Count: " + players.Count);
+
+        PlayerColor playerColor = player.GetComponent<PlayerColor>();
+
+        if (playerColor != null)
+        {
+            playerColor.SetColor(players.Count - 1);
+        }
+
+        PlayerName playerNameComponent = player.GetComponent<PlayerName>();
+
+        if (playerNameComponent != null)
+        {
+            playerNameComponent.SetPlayerName(playerName);
+        }
     }
 
     public void RespawnAllPlayers()

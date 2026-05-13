@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ public class BombSpawner : NetworkBehaviour
 
     private float timer;
 
-    private Bomb bombComp;
+    private List<Bomb> bombComp = new List<Bomb> { };
 
 
     private void Update()
@@ -29,16 +30,21 @@ public class BombSpawner : NetworkBehaviour
             timer = 0f;
             SpawnBomb();
         }
-
-        if (bombComp != null && bombComp.shouldDespawn)
+        foreach (Bomb bomb in bombComp)
         {
-            bombComp.GetComponent<NetworkObject>().Despawn();
-            bombComp = null;
+            if (bombComp != null && bomb.shouldDespawn)
+            {
+                bomb.GetComponent<NetworkObject>().Despawn();
+                bombComp.Remove(bomb);
+                break;
+            }
         }
     }
 
     private void SpawnBomb()
     {
+        if (!IsServer) return;
+
         Vector3 spawnPosition = new Vector3(
             Random.Range(minX, maxX),
             Random.Range(minY, maxY),
@@ -51,7 +57,7 @@ public class BombSpawner : NetworkBehaviour
             Quaternion.identity
         );
 
-        bombComp = bomb.GetComponent<Bomb>();
+        bombComp.Add(bomb.GetComponent<Bomb>());
 
         // Spawn across network
         bomb.GetComponent<NetworkObject>().Spawn();
