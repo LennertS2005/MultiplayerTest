@@ -15,6 +15,8 @@ public class PlayerHealth : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
+    private bool isDead;
+
     public override void OnNetworkSpawn()
     {
         if (IsServer)
@@ -37,6 +39,8 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        if (isDead) return;
+
         currentHealth.Value -= damage ;
 
         if (currentHealth.Value <= 0)
@@ -48,6 +52,8 @@ public class PlayerHealth : NetworkBehaviour
     public void TakeDamage(float damage, ulong attackerClientId)
     {
         if (!IsServer) return;
+
+        if (isDead) return;
 
         currentHealth.Value -= damage;
 
@@ -61,6 +67,7 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (!IsServer) return;
         currentHealth.Value = maxHealth;
+        isDead = false;
         MoveClientRpc(Vector3.zero);
     }
 
@@ -74,6 +81,8 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Die()
     {
+        isDead = true;
+
         MoveClientRpc(new Vector3(50, 50, 0));
     }
     private void Die(ulong killerClientId)
@@ -90,8 +99,14 @@ public class PlayerHealth : NetworkBehaviour
                 stats.KillCount.Value++;
             }
         }
+        isDead = true;
 
         MoveClientRpc(new Vector3(50, 50, 0));
+    }
+
+    public bool GetIsAlive()
+    {
+        return !isDead;
     }
 
     [ClientRpc]

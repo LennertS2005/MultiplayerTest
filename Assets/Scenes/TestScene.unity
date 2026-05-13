@@ -3312,7 +3312,6 @@ MonoBehaviour:
   ipAddress: 127.0.0.1
   port: 7777
   connectCanvas: {fileID: 115743604}
-  playerInput: {fileID: 0}
 --- !u!1 &1953952571
 GameObject:
   m_ObjectHideFlags: 0
@@ -3766,6 +3765,10 @@ PrefabInstance:
     - target: {fileID: 5155163365786954645, guid: 2104b8a33fd5ae944ab85df625c0c200, type: 3}
       propertyPath: m_ActionEvents.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8850160103353765231, guid: 2104b8a33fd5ae944ab85df625c0c200, type: 3}
+      propertyPath: respawnTime
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

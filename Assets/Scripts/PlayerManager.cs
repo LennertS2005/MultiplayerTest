@@ -8,6 +8,10 @@ public class PlayerManager : NetworkBehaviour
     public static PlayerManager Instance;
 
     private List<GameObject> players = new();
+    private List<PlayerHealth> healths = new();
+
+    [SerializeField] private float respawnTime;
+    private float respawnTimer;
 
     [SerializeField] private PlayerInput serverInput;
      public override void OnNetworkSpawn()
@@ -29,13 +33,37 @@ public class PlayerManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        int amountAlive = 0;
+
         foreach (var player in players)
         {
             if (player == null)
             {
                 Debug.LogWarning("Found a null player reference. Removing from list.");
+
+                PlayerHealth health = player.GetComponent<PlayerHealth>();
+                if (healths.Contains(health))
+                {
+                    healths.Remove(health);
+                }
+
                 players.Remove(player);
                 break;
+            }
+        }
+
+        foreach (var health in healths)
+        {
+            if (health.GetIsAlive()) ++amountAlive;
+        }
+
+        if (amountAlive <= 1)
+        {
+            respawnTimer += Time.deltaTime;
+            if (respawnTimer > respawnTime)
+            {
+                respawnTimer = 0;
+                RespawnAllPlayers();
             }
         }
     }
@@ -56,6 +84,10 @@ public class PlayerManager : NetworkBehaviour
         }
 
         players.Add(player);
+
+        PlayerHealth health = player.GetComponent<PlayerHealth>();
+
+        healths.Add(health);
 
         Debug.Log("Added player. Count: " + players.Count);
 
