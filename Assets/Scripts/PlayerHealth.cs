@@ -37,11 +37,11 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
+        currentHealth.Value -= damage ;
 
         if (currentHealth.Value <= 0)
         {
-            MoveClientRpc(new Vector3(50, 50, 0));
+            Die();
         }
     }
 
@@ -72,6 +72,10 @@ public class PlayerHealth : NetworkBehaviour
 
     public float GetHealthPercent() => currentHealth.Value / maxHealth;
 
+    private void Die()
+    {
+        MoveClientRpc(new Vector3(50, 50, 0));
+    }
     private void Die(ulong killerClientId)
     {
         NetworkObject killer =
