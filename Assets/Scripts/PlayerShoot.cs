@@ -14,6 +14,9 @@ public class PlayerShoot : NetworkBehaviour
     private InputAction shootAction;
     private Vector2 facingDirection = Vector2.right; // default facing right
     private float lastShootTime = 0f;
+
+    private ulong clientID;
+
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -27,7 +30,7 @@ public class PlayerShoot : NetworkBehaviour
             if (!canShoot) return;
             if (Time.time - lastShootTime >= shootCooldown)
             {
-                ShootServerRpc(facingDirection, firePoint.position);
+                ShootServerRpc(facingDirection, firePoint.position, clientID);
                 lastShootTime = Time.time;
             }
         }
@@ -45,6 +48,9 @@ public class PlayerShoot : NetworkBehaviour
         shootAction = playerInput.actions["Shoot"];
         shootAction.performed += OnShoot;
         shootAction.canceled += OnShootCanceled;
+
+        clientID = NetworkManager.Singleton.LocalClientId;
+        print("ClientID added: " + clientID);
     }
 
     public override void OnNetworkDespawn()
@@ -73,10 +79,10 @@ public class PlayerShoot : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void ShootServerRpc(Vector2 direction, Vector3 spawnPosition)
+    private void ShootServerRpc(Vector2 direction, Vector3 spawnPosition, ulong shooterClientId)
     {
         GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
-        bullet.GetComponent<BulletNetwork>().Initialize(direction);
+        bullet.GetComponent<BulletNetwork>().Initialize(direction, shooterClientId);
         bullet.GetComponent<NetworkObject>().Spawn();
     }
 }

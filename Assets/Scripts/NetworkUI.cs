@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 public class NetworkUI : MonoBehaviour
 {
-    [SerializeField] private string ipAddress = "127.0.0.1";
+    [SerializeField] private string ipAddress = "";
     [SerializeField] private ushort port = 7777;
 
     [SerializeField] Canvas connectCanvas;
@@ -35,6 +35,12 @@ public class NetworkUI : MonoBehaviour
 
     public void Client()
     {
+        if (string.IsNullOrEmpty(ipAddress))
+        {
+            SetIPAddress(GetLocalIPAddress());
+            return;
+        }
+
         // Connect to host IP
         transport.SetConnectionData(ipAddress, port);
 

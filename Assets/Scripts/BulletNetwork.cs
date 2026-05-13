@@ -9,10 +9,14 @@ public class BulletNetwork : NetworkBehaviour
 
     private Vector2 direction;
 
-    public void Initialize(Vector2 shootDirection)
+    private ulong clientID;
+
+    public void Initialize(Vector2 shootDirection, ulong shooterClientID)
     {
         direction = shootDirection;
+        clientID = shooterClientID;
         transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+
     }
 
     public override void OnNetworkSpawn()
@@ -36,7 +40,7 @@ public class BulletNetwork : NetworkBehaviour
         PlayerHealth health = other.GetComponent<PlayerHealth>();
         if (health != null)
         {
-            health.TakeDamage(damage);
+            health.TakeDamage(damage, clientID);
             DestroyBullet();
         }
     }

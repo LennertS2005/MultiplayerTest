@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "ServerInput",
+    "maps": [
+        {
+            "name": "Server",
+            "id": "2ccd777e-bb55-4736-8946-00a9bf2dbfd7",
+            "actions": [
+                {
+                    "name": "Respawn",
+                    "type": "Button",
+                    "id": "a8bd4fc4-b1d3-4f82-97be-c1f4c32457f7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d3814481-7e41-47db-921b-787e9b3b5e3a",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Respawn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

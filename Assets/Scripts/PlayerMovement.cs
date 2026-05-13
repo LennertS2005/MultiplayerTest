@@ -30,6 +30,9 @@ public class PlayerMovement : NetworkBehaviour
         // Only the owner re-enables PlayerInput and grabs the action
         playerInput.enabled = true;
         moveAction = playerInput.actions["Move"];
+
+        RegisterPlayerServerRpc();
+        RegisterKillUI();
     }
 
     private void Update()
@@ -52,5 +55,19 @@ public class PlayerMovement : NetworkBehaviour
         shootComponent.SetFacingDirection(currentForward);
 
         transform.position += (Vector3)(move * speed * Time.deltaTime);
+    }
+
+    private void RegisterKillUI()
+    {
+        PlayerStats stats = GetComponent<PlayerStats>();
+        KillUI killUI = FindFirstObjectByType<KillUI>();
+        killUI.Initialize(stats);
+    }
+
+    [ServerRpc]
+    private void RegisterPlayerServerRpc()
+    {
+        PlayerManager manager = PlayerManager.Instance;
+        manager.AddPlayer(gameObject);
     }
 }
