@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float speed = 5f;
+    [SerializeField] private float rotationSpeed = 360f;
     private PlayerInput playerInput;
     private InputAction moveAction;
 
@@ -47,7 +48,7 @@ public class PlayerMovement : NetworkBehaviour
             float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg - 90f;
             targetRotation = Quaternion.Euler(0, 0, angle);
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
         Vector2 currentForward = transform.up;
