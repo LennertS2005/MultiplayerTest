@@ -6,6 +6,8 @@ public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float speed = 5f;
     [SerializeField] private float rotationSpeed = 360f;
+    [SerializeField] private bool rotateWithMouse = false;
+
     private PlayerInput playerInput;
     private InputAction moveAction;
 
@@ -63,13 +65,25 @@ public class PlayerMovement : NetworkBehaviour
 
         Vector2 move = moveAction.ReadValue<Vector2>();
 
-        //smoothly Rotate towards movement direction
-        if (move != Vector2.zero)
+        if (rotateWithMouse)
         {
-            float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg - 90f;
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            Vector2 direction = mousePosition - (Vector2)transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
             targetRotation = Quaternion.Euler(0, 0, angle);
 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+        else
+        {
+            //smoothly Rotate towards movement direction
+            if (move != Vector2.zero)
+            {
+                float angle = Mathf.Atan2(move.y, move.x) * Mathf.Rad2Deg - 90f;
+                targetRotation = Quaternion.Euler(0, 0, angle);
+
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
         }
 
         Vector2 currentForward = transform.up;

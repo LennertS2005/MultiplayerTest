@@ -71,6 +71,14 @@ public class PlayerHealth : NetworkBehaviour
         MoveClientRpc(Vector3.zero);
     }
 
+    public void Respawn(Vector3 position)
+    {
+        if (!IsServer) return;
+        currentHealth.Value = maxHealth;
+        isDead = false;
+        MoveClientRpc(position);
+    }
+
     private void HandleHealthChanged(float previous, float current)
     {
         // Fires on all clients automatically via NetworkVariable

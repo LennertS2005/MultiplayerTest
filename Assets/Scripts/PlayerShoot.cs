@@ -6,6 +6,8 @@ public class PlayerShoot : NetworkBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private GameObject pelletPrefab;
+    [SerializeField] private GameObject sniperPrefab;
+
     [SerializeField] private Transform firePoint; // empty child object at gun tip
     [SerializeField] private float shootCooldown = 0.5f;
     [SerializeField] private float shotgunCooldown = 2f;
@@ -15,6 +17,8 @@ public class PlayerShoot : NetworkBehaviour
     private PlayerInput playerInput;
     private InputAction shootAction;
     private InputAction shotgunAction;
+    private InputAction sniperAction;
+
     private Vector2 facingDirection = Vector2.right; // default facing right
     private float lastShootTime = 0f;
 
@@ -53,6 +57,8 @@ public class PlayerShoot : NetworkBehaviour
         shootAction.canceled += OnShootCanceled;
         shotgunAction = playerInput.actions["Shotgun"];
         shotgunAction.performed += OnShotgun;
+        sniperAction = playerInput.actions["Sniper"];
+        sniperAction.performed += OnSniper;
 
         clientID = NetworkManager.Singleton.LocalClientId;
         print("ClientID added: " + clientID);
@@ -63,6 +69,9 @@ public class PlayerShoot : NetworkBehaviour
         if (IsOwner)
         {
             shootAction.performed -= OnShoot;
+            shootAction.canceled -= OnShootCanceled;
+            shotgunAction.performed -= OnShotgun;
+            sniperAction.performed -= OnSniper;
         }
     }
 
@@ -83,7 +92,9 @@ public class PlayerShoot : NetworkBehaviour
         if (canShoot == true) return; //Cant shotgun if already shooting
         if (Time.time - lastShootTime < shotgunCooldown) return;
 
-        //Shoot 10 bullets in a spread pattern
+        ShotgunServerRpc(facingDirection, firePoint.position, clientID);
+
+        /*//Shoot 10 bullets in a spread pattern
         float totalSpreadAngle = 90f;
         int bulletCount = 10;
         float angleStep = totalSpreadAngle / (bulletCount - 1);
@@ -94,7 +105,18 @@ public class PlayerShoot : NetworkBehaviour
             float angle = startAngle + i * angleStep;
             Vector2 spreadDirection = Quaternion.Euler(0, 0, angle) * facingDirection;
             ShotgunServerRpc(spreadDirection, firePoint.position, clientID);
-        }
+        }*/
+
+        lastShootTime = Time.time;
+    }
+
+    private void OnSniper(InputAction.CallbackContext ctx)
+    {
+        if (canShoot == true) return; //Cant shotgun if already shooting
+        if (Time.time - lastShootTime < shotgunCooldown) return;
+
+        SniperServerRpc(facingDirection, firePoint.position, clientID);
+
         lastShootTime = Time.time;
     }
 
@@ -116,13 +138,69 @@ public class PlayerShoot : NetworkBehaviour
         GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
         bullet.GetComponent<BulletNetwork>().Initialize(direction, shooterClientId);
         bullet.GetComponent<NetworkObject>().Spawn();
+
+        ShootClientRpc(direction, spawnPosition);
     }
 
     [ServerRpc]
     private void ShotgunServerRpc(Vector2 direction, Vector3 spawnPosition, ulong shooterClientId)
     {
+        //Shoot 10 bullets in a spread pattern
+        float totalSpreadAngle = 90f;
+        int bulletCount = 10;
+        float angleStep = totalSpreadAngle / (bulletCount - 1);
+        float startAngle = -totalSpreadAngle / 2;
+
+        for (int i = 0; i < bulletCount; i++)
+        {
+            float angle = startAngle + i * angleStep;
+            Vector2 spreadDirection = Quaternion.Euler(0, 0, angle) * direction;
+            ShootShotgun(spreadDirection, spawnPosition, shooterClientId);
+        }
+
+        ShotgunClientRpc(direction, spawnPosition);
+
+        /*GameObject pellet = Instantiate(pelletPrefab, spawnPosition, Quaternion.identity);
+        pellet.GetComponent<BulletNetwork>().Initialize(direction, shooterClientId);
+        pellet.GetComponent<NetworkObject>().Spawn();
+
+        ShotgunClientRpc(direction, spawnPosition);*/
+    }
+
+    private void ShootShotgun(Vector2 direction, Vector3 spawnPosition, ulong shooterClientId)
+    {
+        if (!IsServer) return;
+
         GameObject pellet = Instantiate(pelletPrefab, spawnPosition, Quaternion.identity);
         pellet.GetComponent<BulletNetwork>().Initialize(direction, shooterClientId);
         pellet.GetComponent<NetworkObject>().Spawn();
+    }
+
+    [ServerRpc]
+    private void SniperServerRpc(Vector2 direction, Vector3 spawnPosition, ulong shooterClientId)
+    {
+        GameObject sniperBullet = Instantiate(sniperPrefab, spawnPosition, Quaternion.identity);
+        sniperBullet.GetComponent<BulletNetwork>().Initialize(direction, shooterClientId);
+        sniperBullet.GetComponent<NetworkObject>().Spawn();
+
+        SniperClientRpc(direction, spawnPosition);
+    }
+
+    [ClientRpc]
+    private void ShootClientRpc(Vector2 direction, Vector3 spawnPosition)
+    {
+        SoundManager.Instance.PlaySFX("Rifle");
+    }
+
+    [ClientRpc]
+    private void ShotgunClientRpc(Vector2 direction, Vector3 spawnPosition)
+    {
+        SoundManager.Instance.PlaySFX("Shotgun");
+    }
+
+    [ClientRpc]
+    private void SniperClientRpc(Vector2 direction, Vector3 spawnPosition)
+    {
+        SoundManager.Instance.PlaySFX("Sniper");
     }
 }

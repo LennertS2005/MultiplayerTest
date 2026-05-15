@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3493359068
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 3985377587
+  InScenePlacedSourceGlobalObjectIdHash: 3493359068
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -72,8 +72,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   ShowTopMostFoldoutHeaderGroup: 1
   bombPrefab: {fileID: 4236853709527676753, guid: 5712f77dd5d5e9b469a8837ef8cadc95, type: 3}
-  spawnInterval: 10
-  minX: -9
-  maxX: 9
-  minY: -5
-  maxY: 5
+  spawnInterval: 5
+  minX: -18
+  maxX: 18
+  minY: -10
+  maxY: 10

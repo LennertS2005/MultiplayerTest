@@ -14,7 +14,8 @@ public class PlayerManager : NetworkBehaviour
     private float respawnTimer;
 
     [SerializeField] private PlayerInput serverInput;
-     public override void OnNetworkSpawn()
+    [SerializeField] private List<Transform> spawnPoints;
+    public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
@@ -34,6 +35,7 @@ public class PlayerManager : NetworkBehaviour
     void Update()
     {
         int amountAlive = 0;
+        int idx = 0;
 
         foreach (var player in players)
         {
@@ -41,13 +43,10 @@ public class PlayerManager : NetworkBehaviour
             {
                 Debug.LogWarning("Found a null player reference. Removing from list.");
 
-                PlayerHealth health = player.GetComponent<PlayerHealth>();
-                if (healths.Contains(health))
-                {
-                    healths.Remove(health);
-                }
+                healths.RemoveAt(idx);
 
                 players.Remove(player);
+                ++idx;
                 break;
             }
         }
@@ -89,6 +88,9 @@ public class PlayerManager : NetworkBehaviour
 
         healths.Add(health);
 
+        Vector3 spawnPos = spawnPoints[(players.Count - 1) % spawnPoints.Count].position;
+        health.Respawn(spawnPos);
+
         Debug.Log("Added player. Count: " + players.Count);
 
         PlayerColor playerColor = player.GetComponent<PlayerColor>();
@@ -108,14 +110,21 @@ public class PlayerManager : NetworkBehaviour
 
     public void RespawnAllPlayers()
     {
+        Vector3 spawnPos = Vector3.zero;
+        int playerIndex = 0;
+
         if (!IsServer) return;
         foreach (var player in players)
         {
+            spawnPos = spawnPoints[playerIndex % spawnPoints.Count].position;
+
             var health = player.GetComponent<PlayerHealth>();
             if (health != null)
             {
-                health.Respawn();
+                health.Respawn(spawnPos);
             }
+            ++playerIndex;
+
         }
     }
 }

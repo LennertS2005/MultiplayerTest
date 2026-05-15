@@ -36,6 +36,18 @@ public class BulletNetwork : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        if (other.CompareTag("Obstacle"))
+        {
+            DestroyBullet();
+            return;
+        }
+
+        NetworkObject otherNetworkObject = other.GetComponent<NetworkObject>();
+        if (otherNetworkObject != null && otherNetworkObject.OwnerClientId == clientID)
+        {
+            return;
+        }
+
         // Don't hit the shooter's own collider
         PlayerHealth health = other.GetComponent<PlayerHealth>();
         if (health != null)

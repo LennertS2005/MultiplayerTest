@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 71413156
+  GlobalObjectIdHash: 3225430942
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -342,6 +342,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   speed: 5
   rotationSpeed: 360
+  rotateWithMouse: 1
 --- !u!114 &3240894888566416073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,6 +456,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: b612301f-3056-4421-a559-f15892c0e58a
     m_ActionName: 'Player/Leave[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f24f459e-0276-4269-982e-7a0580df5dba
+    m_ActionName: 'Player/Sniper[/Keyboard/ctrl,/Mouse/middleButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -552,6 +557,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   bulletPrefab: {fileID: 3620816221038236915, guid: 6223dc830321d4149bd46397bc77fb61, type: 3}
   pelletPrefab: {fileID: 3695205034146231637, guid: 1253ae4e5dd12d0469069a9ffecec3b7, type: 3}
+  sniperPrefab: {fileID: 454532931562904927, guid: 964b9956a1a8322448909f8943b4085e, type: 3}
   firePoint: {fileID: 5496119657223778504}
   shootCooldown: 0.1
   shotgunCooldown: 2
